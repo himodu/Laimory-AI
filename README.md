@@ -1,126 +1,221 @@
 # Laimory-AI
 
 Laimory AI 서버 프로젝트입니다.
-FastAPI 기반으로 구성되어 있으며, Python 의존성 관리는 `uv`를 사용합니다.
 
-## 개발 환경
+FastAPI 기반으로 구성되어 있으며 Python 의존성 관리는 `uv`와 `pyproject.toml`을 사용합니다.
 
-* Python 3.14
-* FastAPI
-* Uvicorn
-* uv
-* PyCharm
+---
 
-## 프로젝트 실행 구조
+## Tech Stack
+
+- Python 3.14
+- FastAPI
+- Uvicorn
+- uv
+- PyCharm
+
+---
+
+## Project Structure
 
 ```text
 Laimory-AI/
 ├─ app/
 │  ├─ __init__.py
 │  └─ main.py
-├─ .venv/
 ├─ .env
-├─ .python-version
+├─ .gitignore
 ├─ pyproject.toml
 ├─ uv.lock
 └─ README.md
 ```
 
-## uv 설치 경로
+---
 
-Windows 기준 uv 실행 파일 위치:
+## Prerequisites
 
-```text
-C:\Users\이동건\.local\bin\uv.exe
+Python 3.14 이상이 필요합니다.
+
+```bash
+python --version
 ```
 
-터미널에서 `uv` 명령어가 인식되지 않을 경우, 절대경로로 실행합니다.
+uv 설치 여부를 확인합니다.
+
+```bash
+uv --version
+```
+
+설치되어 있지 않다면 아래 명령어로 설치합니다.
 
 ```powershell
-C:\Users\이동건\.local\bin\uv.exe --version
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-## 의존성 설치
+---
 
-`pyproject.toml`에 정의된 의존성을 설치합니다.
+## Install Dependencies
 
-```powershell
-C:\Users\이동건\.local\bin\uv.exe sync
+프로젝트 루트에서 실행합니다.
+
+```bash
+uv sync
 ```
 
-## 의존성 추가
+`pyproject.toml`과 `uv.lock`을 기준으로 의존성이 설치됩니다.
 
-새 패키지를 추가할 때는 다음 명령어를 사용합니다.
+---
 
-```powershell
-C:\Users\이동건\.local\bin\uv.exe add 패키지명
-```
+## Dependency Management
+
+의존성은 `pyproject.toml`의 `dependencies`에 직접 추가합니다.
 
 예시:
 
-```powershell
-C:\Users\이동건\.local\bin\uv.exe add python-dotenv
-C:\Users\이동건\.local\bin\uv.exe add rich
+```toml
+[project]
+name = "laimory-ai"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.136.3",
+    "uvicorn[standard]>=0.49.0",
+    "python-dotenv>=1.1.0",
+    "rich>=14.0.0",
+]
 ```
 
-이 명령어를 실행하면 `pyproject.toml`과 `uv.lock`이 함께 갱신됩니다.
+의존성을 추가하거나 제거한 뒤 PyCharm 실행 버튼을 누르면, 실행 전에 `uv sync`가 자동으로 실행되어 변경 사항이 반영됩니다.
 
-## 서버 실행
+즉, 실행 흐름은 다음과 같습니다.
+
+```text
+pyproject.toml 수정
+→ PyCharm Run 버튼 클릭
+→ uv sync 실행
+→ FastAPI 서버 실행
+```
+
+---
+
+## Environment Variables
+
+프로젝트 루트에 `.env` 파일을 생성합니다.
+
+```env
+APP_ENV=local
+OPENAI_API_KEY=your-api-key
+```
+
+`.env` 파일은 민감 정보를 포함할 수 있으므로 Git에 올리지 않습니다.
+
+---
+
+## Run Server
 
 터미널에서 직접 실행할 경우:
 
-```powershell
-C:\Users\이동건\.local\bin\uv.exe run uvicorn app.main:app --reload
+```bash
+uv run uvicorn app.main:app --reload
 ```
 
 실행 후 아래 주소에서 확인할 수 있습니다.
 
 ```text
-http://127.0.0.1:8000/health
-http://127.0.0.1:8000/docs
+http://localhost:8000/health
+http://localhost:8000/docs
 ```
 
-## PyCharm 원클릭 실행 설정
+---
 
-PyCharm에서 Run Configuration을 생성합니다.
+## PyCharm One-Click Run Configuration
+
+PyCharm에서 실행 버튼 한 번으로 `uv sync` 후 FastAPI 서버가 실행되도록 설정합니다.
+
+### 1. Python Interpreter 설정
+
+PyCharm에서 프로젝트 인터프리터를 `.venv`로 설정합니다.
 
 ```text
-Run → Edit Configurations... → + → Python
+Settings
+→ Python Interpreter
+→ Add Interpreter
+→ Existing Environment
+```
+
+인터프리터 경로:
+
+```text
+.venv/Scripts/python.exe
+```
+
+Mac/Linux의 경우:
+
+```text
+.venv/bin/python
+```
+
+---
+
+### 2. FastAPI 실행 설정
+
+PyCharm 상단 오른쪽의 실행 설정 드롭다운을 클릭합니다.
+
+```text
+Add Configuration...
+또는
+Edit Configurations...
+```
+
+다음 순서로 설정을 추가합니다.
+
+```text
++ → Python
 ```
 
 설정값:
 
 ```text
-Name: FastAPI
+Name:
+FastAPI
+
 Script path:
-C:\Users\이동건\Desktop\GitRepositories\Laimory-AI\.venv\Scripts\uvicorn.exe
+.venv/Scripts/uvicorn.exe
 
 Parameters:
 app.main:app --reload
 
 Working directory:
-C:\Users\이동건\Desktop\GitRepositories\Laimory-AI
-
-Python interpreter:
-C:\Users\이동건\Desktop\GitRepositories\Laimory-AI\.venv\Scripts\python.exe
+$ProjectFileDir$
 ```
 
-## 실행 전 uv sync 자동 실행 설정
-
-PyCharm Run Configuration의 `Before launch`에 External Tool을 추가합니다.
+Mac/Linux의 경우 Script path:
 
 ```text
-Before launch → + → Run External Tool → + 
+.venv/bin/uvicorn
 ```
 
-External Tool 설정값:
+---
+
+### 3. 실행 전 uv sync 자동 실행 설정
+
+FastAPI Run Configuration 화면 하단의 `Before launch` 영역에서 설정합니다.
+
+```text
+Before launch
+→ +
+→ Run External Tool
+→ +
+```
+
+External Tool 값을 다음과 같이 입력합니다.
 
 ```text
 Name:
 uv sync
 
 Program:
-C:\Users\이동건\.local\bin\uv.exe
+uv
 
 Arguments:
 sync
@@ -129,41 +224,55 @@ Working directory:
 $ProjectFileDir$
 ```
 
-이렇게 설정하면 PyCharm의 실행 버튼을 누를 때마다 다음 순서로 동작합니다.
+만약 `uv` 명령어가 인식되지 않는다면, `Program`에는 uv 실행 파일의 절대경로를 입력합니다.
+
+예시:
 
 ```text
-1. uv sync 실행
-2. FastAPI 서버 실행
+<uv-install-dir>/uv.exe
 ```
 
-따라서 `pyproject.toml`에 의존성을 추가한 뒤 실행 버튼을 누르면, 의존성이 자동으로 반영된 후 서버가 실행됩니다.
+설정 후 다음 순서로 저장합니다.
 
-## 환경변수 설정
-
-프로젝트 루트에 `.env` 파일을 생성합니다.
-
-```env
-APP_ENV=local
-OPENAI_API_KEY=test-api-key
+```text
+OK → Apply → OK
 ```
 
-`main.py`에서는 `python-dotenv`를 통해 `.env` 값을 불러옵니다.
+이제 PyCharm의 초록색 실행 버튼을 누르면 다음 순서로 실행됩니다.
 
-```python
-from dotenv import load_dotenv
-
-load_dotenv()
+```text
+1. uv sync
+2. uvicorn app.main:app --reload
 ```
 
-## 주의사항
+---
 
-`.env` 파일에는 API Key 등 민감 정보가 들어갈 수 있으므로 Git에 올리지 않습니다.
+## Health Check
 
-`.gitignore`에 다음 내용을 추가합니다.
+서버 실행 후 아래 API로 동작을 확인합니다.
+
+```text
+GET /health
+```
+
+예상 응답:
+
+```json
+{
+  "status": "ok"
+}
+```
+
+---
+
+## Git Ignore
+
+`.gitignore`에 다음 항목을 추가합니다.
 
 ```gitignore
 .venv/
 .env
-__pycache__/
 .idea/
+__pycache__/
+*.pyc
 ```
